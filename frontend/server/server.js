@@ -107,7 +107,9 @@ io.on('connection', (socket) => {
                     qcount: game.gameData.question + " / " + res.questions.length,
                     playersInGame: playerData.length
                 });
-                // send the question to players
+                game.gameData.questionNow = question.answers;
+                game.gameData.correct = question.correct;
+                // tell the players that the game is start
                 io.to(game.pin).emit('gameStartedPlayer');
             }).catch((err) => {
                 throw err;
@@ -128,18 +130,11 @@ io.on('connection', (socket) => {
         for(var i = 0; i < games.games.length; i++){
             //If the pin is equal to one of the game's pin
             if(params.pin == games.games[i].pin){
-                
                 console.log('Player connected to game');
-                
                 var hostId = games.games[i].hostId; //Get the id of host of game
-                
-                
-                players.addPlayer(hostId, socket.id, params.name, {score: 0, answer: 0}); //add player to game
-                
+                players.addPlayer(hostId, socket.id, params.name, {score: 0, answer: 0, appendScore: 0}); //add player to game
                 socket.join(params.pin); //Player is joining room based on pin
-                
                 var playersInGame = players.getPlayers(hostId); //Getting all players in game
-                
                 io.to(params.pin).emit('updatePlayerLobby', playersInGame);//Sending host player data to display
                 gameFound = true; //Game has been found
             }
@@ -149,20 +144,19 @@ io.on('connection', (socket) => {
         if(gameFound == false){
             socket.emit('noGameFound'); //Player is sent back to 'join' page because game was not found with pin
         }
-        
-        
     });
     
     //When the player connects from game view
     socket.on('player-join-game', (data) => {
-        var player = players.getPlayer(data.id);
+        var player = players.getPlayerByLobbyId(data.id);
         if(player){
             var game = games.getGame(player.hostId);
             socket.join(game.pin);
-            player.playerId = socket.id;//Update player id with socket id
-            
+            player.playerId = socket.id; // Update player id with socket id
             var playerData = players.getPlayers(game.hostId);
-            socket.emit('playerGameData', playerData);
+            socket.emit('playerGameData', {name: player.name, score: player.gameData.score});
+            // tell the player the going on question
+            socket.emit('nextQuestionPlayer', {answers: game.gameData.questionNow});
         }else{
             socket.emit('noGameFound');//No player found
         }
@@ -215,88 +209,63 @@ io.on('connection', (socket) => {
     socket.on('playerAnswer', function(num){
         var player = players.getPlayer(socket.id);
         var hostId = player.hostId;
-        var playerNum = players.getPlayers(hostId);
+        var playerNum = players.getPlayers(hostId).length;
         var game = games.getGame(hostId);
         if(game.gameData.questionLive == true){//if the question is still live
             player.gameData.answer = num;
             game.gameData.playersAnswered += 1;
             
-            var gameQuestion = game.gameData.question;
-            var gameid = game.gameData.gameid;
-            
-            MongoClient.connect(url, function(err, db){
-                if (err) throw err;
-    
-                var dbo = db.db('kahootDB');
-                var query = { id:  parseInt(gameid)};
-                dbo.collection("kahootGames").find(query).toArray(function(err, res) {
-                    if (err) throw err;
-                    var correctAnswer = res[0].questions[gameQuestion - 1].correct;
-                    //Checks player answer with correct answer
-                    if(num == correctAnswer){
-                        player.gameData.score += 100;
-                        io.to(game.pin).emit('getTime', socket.id);
-                        socket.emit('answerResult', true);
-                    }
-
-                    //Checks if all players answered
-                    if(game.gameData.playersAnswered == playerNum.length){
-                        game.gameData.questionLive = false; //Question has been ended bc players all answered under time
-                        var playerData = players.getPlayers(game.hostId);
-                        io.to(game.pin).emit('questionOver', playerData, correctAnswer);//Tell everyone that question is over
-                    }else{
-                        //update host screen of num players answered
-                        io.to(game.pin).emit('updatePlayersAnswered', {
-                            playersInGame: playerNum.length,
-                            playersAnswered: game.gameData.playersAnswered
-                        });
-                    }
-                    
-                    db.close();
-                });
+            var correctAnswer = game.gameData.correct;
+            //Checks player answer with correct answer
+            if(num == correctAnswer){
+                player.gameData.appendScore += 100;
+            }
+            //update host screen of num players answered
+            io.to(game.pin).emit('updatePlayersAnswered', {
+                playersInGame: playerNum,
+                playersAnswered: game.gameData.playersAnswered,
+                playerId: socket.id,
+                correct: num == correctAnswer
             });
-            
-            
-            
         }
     });
     
-    socket.on('getScore', function(){
-        var player = players.getPlayer(socket.id);
-        socket.emit('newScore', player.gameData.score); 
-    });
-    
-    socket.on('time', function(data){
+    socket.on('questionTime', function(data){
         var time = data.time / 20;
         time = time * 100;
         var playerid = data.player;
         var player = players.getPlayer(playerid);
-        player.gameData.score += time;
+        player.gameData.appendScore += time;
+        
+        // Get the game
+        var hostId = player.hostId;
+        var game = games.getGame(hostId);
+        var playerNum = players.getPlayers(hostId).length;
+        // Checks if all players answered
+        if(game.gameData.playersAnswered == playerNum){
+            game.gameData.questionLive = false; //Question has been ended bc players all answered under time
+            var playerData = players.getPlayers(game.hostId);
+            // Update the score for every player
+            playerData.forEach(player => {
+                player.gameData.score = player.gameData.appendScore;
+            })
+            //Tell everyone that question is over
+            io.to(game.pin).emit('questionOver', playerData, game.gameData.correct);
+        }
     });
-    
-    
     
     socket.on('timeUp', function(){
         var game = games.getGame(socket.id);
         game.gameData.questionLive = false;
         var playerData = players.getPlayers(game.hostId);
+        // Update the score for every player
+        playerData.forEach(player => {
+            player.gameData.score = player.gameData.appendScore;
+        })
         
-        var gameQuestion = game.gameData.question;
-        var gameid = game.gameData.gameid;
-            
-            MongoClient.connect(url, function(err, db){
-                if (err) throw err;
-    
-                var dbo = db.db('kahootDB');
-                var query = { id:  parseInt(gameid)};
-                dbo.collection("kahootGames").find(query).toArray(function(err, res) {
-                    if (err) throw err;
-                    var correctAnswer = res[0].questions[gameQuestion - 1].correct;
-                    io.to(game.pin).emit('questionOver', playerData, correctAnswer);
-                    
-                    db.close();
-                });
-            });
+        var correctAnswer = game.gameData.correct;
+        //Tell everyone that question is over
+        io.to(game.pin).emit('questionOver', playerData, correctAnswer);
     });
     
     socket.on('nextQuestion', function(){
@@ -310,7 +279,6 @@ io.on('connection', (socket) => {
         
         var game = games.getGame(socket.id);
         game.gameData.playersAnswered = 0;
-        game.gameData.questionLive = true;
         game.gameData.question += 1;
         var gameid = game.gameData.gameid;
 
@@ -322,13 +290,16 @@ io.on('connection', (socket) => {
             }
             
             if(question != null){
+                game.gameData.questionLive = true;
                 socket.emit('gameQuestions', {
                     question: question.question,
                     answers: question.answers,
                     qcount: game.gameData.question + " / " + res.questions.length,
                     playersInGame: playerData.length
                 });
-    
+                game.gameData.questionNow = question.answers;
+                game.gameData.correct = question.correct;
+                // tell players the next question
                 io.to(game.pin).emit('nextQuestionPlayer', {answers: question.answers});
             }
             else{

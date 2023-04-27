@@ -1,8 +1,7 @@
 var socket = io();
 var playerAnswered = false;
-var correct = false;
-var name;
-var score = 0;
+var answer = 0;
+var playerName;
 
 var params = jQuery.deparam(window.location.search); //Gets the id from url
 
@@ -24,18 +23,13 @@ function answerSubmitted(num){
         document.getElementsByClassName("buttons")[0].style.display="none"
         document.getElementById('message').innerHTML = "Answer Submitted! Waiting on other players...";
         document.getElementById('message').style.display = "block";
+        // Save the answer
+        answer = num;
     }
 }
 
-//Get results on last question
-socket.on('answerResult', function(data){
-    if(data == true){
-        correct = true;
-    }
-});
-
-socket.on('questionOver', function(data){
-    if(correct == true){
+socket.on('questionOver', function(playerData, correct){
+    if(correct == answer){
         document.body.style.backgroundColor = "#4CAF50";
         document.getElementById('message').style.display = "block";
         document.getElementById('message').innerHTML = "Correct!";
@@ -44,12 +38,10 @@ socket.on('questionOver', function(data){
         document.getElementById('message').style.display = "block";
         document.getElementById('message').innerHTML = "Incorrect!";
     }
-    document.getElementsByClassName("buttons")[0].style.display="none"
-    socket.emit('getScore');
-});
-
-socket.on('newScore', function(data){
-    document.getElementById('scoreText').innerHTML = "Score: " + data;
+    playerData.forEach(elem => {
+        if(elem.name == playerName)
+            document.getElementById('scoreText').innerHTML = "Score: " + elem.gameData.score;
+    });
 });
 
 socket.on('nextQuestionPlayer', function(data){
@@ -67,12 +59,9 @@ socket.on('hostDisconnect', function(){
 });
 
 socket.on('playerGameData', function(data){
-   for(var i = 0; i < data.length; i++){
-       if(data[i].playerId == socket.id){
-           document.getElementById('nameText').innerHTML = "Name: " + data[i].name;
-           document.getElementById('scoreText').innerHTML = "Score: " + data[i].gameData.score;
-       }
-   }
+    playerName = data.name;
+    document.getElementById('nameText').innerHTML = "Name: " + data.name;
+    document.getElementById('scoreText').innerHTML = "Score: " + data.score;
 });
 
 socket.on('GameOver', function(_){

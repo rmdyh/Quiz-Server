@@ -39,7 +39,14 @@ function updateTimer(){
 }
 
 socket.on('updatePlayersAnswered', function(data){
-   document.getElementById('playersAnswered').innerHTML = "Players Answered " + data.playersAnswered + " / " + data.playersInGame; 
+    // Update answered
+    var text = "Players Answered " + data.playersAnswered + " / " + data.playersInGame;
+    document.getElementById('playersAnswered').innerHTML = text; 
+    // Return the time
+    socket.emit('questionTime', {
+        player: data.playerId,
+        time: data.correct ? time : 0
+    });
 });
 
 socket.on('questionOver', function(playerData, correct){
@@ -111,13 +118,6 @@ socket.on('GameOver', function(data){
     document.getElementsByClassName('game-results')[0].style.display = "block";
 });
 
-
-socket.on('getTime', function(player){
-    socket.emit('time', {
-        player: player,
-        time: time
-    });
-});
 
 
 
