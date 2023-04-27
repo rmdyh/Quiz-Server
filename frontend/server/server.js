@@ -151,16 +151,16 @@ io.on('connection', (socket) => {
         var player = players.getPlayerByLobbyId(data.id);
         if(player){
             var game = games.getGame(player.hostId);
-            socket.join(game.pin);
-            player.playerId = socket.id; // Update player id with socket id
-            var playerData = players.getPlayers(game.hostId);
-            socket.emit('playerGameData', {name: player.name, score: player.gameData.score});
-            // tell the player the going on question
-            socket.emit('nextQuestionPlayer', {answers: game.gameData.questionNow});
-        }else{
-            socket.emit('noGameFound');//No player found
+            if(game.gameLive){
+                socket.join(game.pin);
+                player.playerId = socket.id; // Update player id with socket id
+                socket.emit('playerGameData', {name: player.name, score: player.gameData.score});
+                // tell the player the going on question
+                socket.emit('nextQuestionPlayer', {answers: game.gameData.questionNow});
+                return;
+            }
         }
-        
+        socket.emit('noGameFound');//No player found
     });
     
     //When a host or player leaves the site
@@ -174,15 +174,13 @@ io.on('connection', (socket) => {
                 console.log('Game ended with pin:', game.pin);
 
                 var playersToRemove = players.getPlayers(game.hostId); //Getting all players in the game
-
                 //For each player in the game
                 for(var i = 0; i < playersToRemove.length; i++){
                     players.removePlayer(playersToRemove[i].playerId); //Removing each player from player class
                 }
-
                 io.to(game.pin).emit('hostDisconnect'); //Send player back to 'join' screen
-                socket.leave(game.pin); //Socket is leaving room
             }
+            socket.leave(game.pin); //Socket is leaving room
         }else{
             //No game has been found, so it is a player socket that has disconnected
             var player = players.getPlayer(socket.id); //Getting player with socket.id
@@ -190,16 +188,24 @@ io.on('connection', (socket) => {
             if(player){
                 var hostId = player.hostId;//Gets id of host of the game
                 var game = games.getGame(hostId);//Gets game data with hostId
-                var pin = game.pin;//Gets the pin of the game
-                
-                if(game.gameLive == false){
-                    players.removePlayer(socket.id);//Removes player from players class
-                    var playersInGame = players.getPlayers(hostId);//Gets remaining players in game
-
-                    io.to(pin).emit('updatePlayerLobby', playersInGame);//Sends data to host to update screen
-                    socket.leave(pin); //Player is leaving the room
-            
+                if(game){
+                    if(game.gameLive == false){
+                        players.removePlayer(socket.id);//Removes player from players class
+                        socket.leave(game.pin); //Player is leaving the room
+                    }
                 }
+            }
+            var player = players.getPlayerByLobbyId(socket.id)
+            // If the player is in the lobby
+            if(player){
+                var hostId = player.hostId;//Gets id of host of the game
+                var game = games.getGame(hostId);//Gets game data with hostId
+                if(game.gameLive == false){
+                    players.removePlayerByLobbyId(socket.id);//Removes player from players class
+                    var playersInGame = players.getPlayers(hostId);//Gets remaining players in game
+                    io.to(game.pin).emit('updatePlayerLobby', playersInGame);//Sends data to host to update screen
+                }
+                socket.leave(game.pin); //Player is leaving the room
             }
         }
         
@@ -319,7 +325,7 @@ io.on('connection', (socket) => {
                             name: '古明地こいし',
                             score: 0
                         });
-                
+                game.gameLive = false;
                 io.to(game.pin).emit('GameOver', {ret: ret});
             }
         }).catch((err)=>{

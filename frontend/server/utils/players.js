@@ -18,6 +18,14 @@ class Players {
     getPlayer(playerId){
         return this.players.filter((player) => player.playerId === playerId)[0]
     }
+    removePlayerByLobbyId(playerLobbyId){
+        var player = this.getPlayerByLobbyId(playerLobbyId);
+        
+        if(player){
+            this.players = this.players.filter((player) => player.playerLobbyId !== playerLobbyId);
+        }
+        return player;
+    }
     getPlayerByLobbyId(playerLobbyId){
         return this.players.filter((player) => player.playerLobbyId === playerLobbyId)[0]
     }
