@@ -350,7 +350,7 @@ io.on('connection', (socket) => {
                         });
                     else
                         ret.push({
-                            name: 'Nobody',
+                            name: '古明地こいし',
                             score: 0
                         });
                 

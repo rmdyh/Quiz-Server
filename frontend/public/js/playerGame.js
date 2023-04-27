@@ -19,14 +19,11 @@ socket.on('noGameFound', function(){
 function answerSubmitted(num){
     if(playerAnswered == false){
         playerAnswered = true;
-        
         socket.emit('playerAnswer', num);//Sends player answer to server
-        
         //Hiding buttons from user
         document.getElementsByClassName("buttons")[0].style.display="none"
-        document.getElementById('message').style.display = "block";
         document.getElementById('message').innerHTML = "Answer Submitted! Waiting on other players...";
-        
+        document.getElementById('message').style.display = "block";
     }
 }
 
@@ -58,7 +55,7 @@ socket.on('newScore', function(data){
 socket.on('nextQuestionPlayer', function(data){
     correct = false;
     playerAnswered = false;
-    document.getElementsByClassName("buttons")[0].style.display="none"
+    document.getElementsByClassName("buttons")[0].style.display="block"
     document.getElementById('message').style.display = "none";
     document.body.style.backgroundColor = "white";
     for(var i = 1; i <= 4; i++)
