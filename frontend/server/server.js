@@ -151,7 +151,10 @@ io.on('connection', (socket) => {
         var player = players.getPlayerByLobbyId(data.id);
         if(player){
             var game = games.getGame(player.hostId);
-            if(game.gameLive){
+            // only when game is alive and
+            // there is no other player with the same lobby id
+            // can this socket join the game
+            if(game.gameLive && player.playerId == undefined){
                 socket.join(game.pin);
                 player.playerId = socket.id; // Update player id with socket id
                 socket.emit('playerGameData', {name: player.name, score: player.gameData.score});
@@ -189,7 +192,9 @@ io.on('connection', (socket) => {
                 var hostId = player.hostId;//Gets id of host of the game
                 var game = games.getGame(hostId);//Gets game data with hostId
                 if(game){
-                    if(game.gameLive == false){
+                    if(game.gameLive){
+                        player.playerId = undefined;
+                    } else{
                         players.removePlayer(socket.id);//Removes player from players class
                         socket.leave(game.pin); //Player is leaving the room
                     }
@@ -314,18 +319,24 @@ io.on('connection', (socket) => {
                     return b.gameData.score - a.gameData.score;
                 })
                 var ret = [];
-                for(var i = 0; i < 5; i++)
+                var resultStr = "Quiz " + game.pin + " end! Results: ";
+                for(var i = 0; i < 5; i++){
                     if(i < playersInGame.length)
+                    {
                         ret.push({
                             name: playersInGame[i].name,
                             score: playersInGame[i].gameData.score
                         });
-                    else
+                        resultStr += playersInGame[i].name + '(' + playersInGame[i].playerLobbyId + ');';
+                    } else{
                         ret.push({
                             name: '古明地こいし',
                             score: 0
                         });
+                    }
+                }
                 game.gameLive = false;
+                console.log(resultStr);
                 io.to(game.pin).emit('GameOver', {ret: ret});
             }
         }).catch((err)=>{
