@@ -67,16 +67,18 @@ body {
     margin: 20px 0;
 }
 
-.game-results div {
-    font-size: 30px;
-    text-align: center;
-}
-
 .game-results h2{
     font-size: 40px;
+}
+
+.game-results div {
+    font-size: 25px;
+    text-align: center;
+    font-weight: bold;
 }
 
 .game-results #winnerTitle{
     font-size: 35px;
     color: #3399ff;
+    margin: 10px 0;
 }
