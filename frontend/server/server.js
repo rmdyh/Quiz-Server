@@ -30,8 +30,10 @@ async function getGameById (gameid) {
     
             dbo.collection("kahootGames").find(query).toArray((err, res) => {
                 if (err) throw err;
-                resolve(res);
+                resolve(res[0]);
             });
+
+            db.close()
         });
     })
 }
@@ -317,49 +319,42 @@ io.on('connection', (socket) => {
         game.gameData.questionLive = true;
         game.gameData.question += 1;
         var gameid = game.gameData.gameid;
-        
-        MongoClient.connect(url, (err, db) => {
 
-            if (err) throw err;
-            var dbo = db.db('kahootDB');
-            var query = { id:  parseInt(gameid)};
+        getGameById(gameid).then((res) => {
+            var question = null;
 
-            dbo.collection("kahootGames").find(query).toArray((err, res) => {
-                if (err) throw err;
-                var question = null;
-
-                if(res[0].questions.length >= game.gameData.question){
-                    question = res[0].questions[game.gameData.question - 1];
-                }
-                db.close();
-                
-                if(question != null){
-                    socket.emit('gameQuestions', {
-                        question: question.question,
-                        answers: question.answers,
-                        playersInGame: playerData.length
-                    });
-        
-                    io.to(game.pin).emit('nextQuestionPlayer', {answers: question.answers});
-                }
-                else{
-                    var playersInGame = players.getPlayers(game.hostId);
-                    playersInGame.sort((a, b)=>{
-                        return b.gameData.score - a.gameData.score;
+            if(res.questions.length >= game.gameData.question){
+                question = res.questions[game.gameData.question - 1];
+            }
+            
+            if(question != null){
+                socket.emit('gameQuestions', {
+                    question: question.question,
+                    answers: question.answers,
+                    playersInGame: playerData.length
+                });
+    
+                io.to(game.pin).emit('nextQuestionPlayer', {answers: question.answers});
+            }
+            else{
+                var playersInGame = players.getPlayers(game.hostId);
+                playersInGame.sort((a, b)=>{
+                    return b.gameData.score - a.gameData.score;
+                })
+                var ret = [];
+                for(var i = 0; i < 5 && i < playersInGame.length; i++)
+                    ret.push({
+                        name: playersInGame[i].name,
+                        score: playersInGame[i].gameData.score
                     })
-                    var ret = [];
-                    for(var i = 0; i < 5 && i < playersInGame.length; i++)
-                        ret.push({
-                            name: playersInGame[i].name,
-                            score: playersInGame[i].gameData.score
-                        })
-                    
-                    io.to(game.pin).emit('GameOver', {
-                        ret: ret
-                    });
-                }
-            });
-        });
+                
+                io.to(game.pin).emit('GameOver', {
+                    ret: ret
+                });
+            }
+        }).catch((err)=>{
+            throw err;
+        })
     });
     
     //When the host starts the game
