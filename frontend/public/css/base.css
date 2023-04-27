@@ -1,0 +1,39 @@
+@font-face {
+  font-family: NotoSans;
+  src: url("../fonts/NotoSansCJK-Regular-1.subset.woff2");
+}
+
+body {
+  padding: 0;
+  margin: 0;
+  font-family: 'NotoSans', sans-serif;
+  color: #333;
+  box-sizing: border-box;
+}
+
+h1, h2, h3{
+  text-align: center;
+}
+
+h4, h5, h6{
+  text-align: left;
+}
+
+a {
+  text-decoration: none;
+  color: inherit;
+  font-family: inherit;
+  cursor: pointer;
+}
+a:hover{
+  text-decoration: underline;
+}
+
+button {
+  cursor: pointer;
+  font-family: inherit;
+}
+
+.center {
+  text-align: center;
+}

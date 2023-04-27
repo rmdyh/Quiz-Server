@@ -2,19 +2,16 @@
 <html>
     <head>
         <title>Host | KahootClone</title>
+        <link rel = "stylesheet" href = "../css/base.css">
+        <link rel = "stylesheet" href = "../css/bgcolor.css">
         <link rel = "stylesheet" href = "../css/host.css">
-        <link href="https://fonts.googleapis.com/css?family=Raleway" rel="stylesheet">
-        <link href="https://fonts.googleapis.com/css?family=Tajawal" rel="stylesheet">
     </head>
     <body>
-        <button id = "cancel" onclick = "endGame()">Cancel Game</button>
-        <h2 id = "title">Join this Game using the Game Pin: </h2>
-        <h1 id = "gamePinText"></h1>
-        <textarea style = "width: 700px; height: 500px;" readonly id = 'players'></textarea>
-        <br>
+        <a id = "cancel" onclick = "endGame()">Cancel Game</a>
+        <div id = "title">Join this Game using the Game Pin: </div>
+        <div id = "gamePinText">XXXXX</div>
+        <textarea style = "width: 700px; flex-grow: 1;" readonly id = 'players'></textarea>
         <button id = 'start' onclick = "startGame()">Start Game</button>
-        <br>
-        <br>
         <script src = "../socket.io/socket.io.js"></script>
         <script src = "../js/libs/jqueryLibrary.js"></script>
         <script src = "../js/libs//deparam.js"></script>

@@ -1,7 +1,22 @@
-html, body { height: 90%; padding: 0; margin: 0; }
-button{
-    width: 50%; height: 50%; float: left;
+html, body {
+    height: 100%;
 }
+body {
+    display: flex;
+    flex-direction: column;
+    align-items: stretch;
+}
+
+button{
+    width: 50%;
+    height: 50%;
+    float: left;
+    font-size: 20px;
+    font-weight: bold;
+    color: #000;
+    border: #fff 2px solid;
+}
+
 #answer1{
     background-color: #4CAF50;
 }
@@ -15,19 +30,17 @@ button{
     background-color: #ff9933;
 }
 
-#buttons{
-    text-align: center;
-}
-#nameText{
-    font-family: 'Raleway', sans-serif;
+.stats{
     padding: 0px 10px;
+    flex-grow: 0;
 }
-#scoreText{
-    font-family: 'Raleway', sans-serif;
-    padding: 0px 10px;
+
+.buttons{
+    flex-grow: 1;
 }
+
 #message{
-    font-family: 'Raleway', sans-serif;
     text-align: center;
     font-size: 35px;
+    display: none;
 }

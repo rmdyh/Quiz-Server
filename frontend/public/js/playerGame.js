@@ -9,11 +9,7 @@ var params = jQuery.deparam(window.location.search); //Gets the id from url
 socket.on('connect', function() {
     //Tell server that it is host connection from game view
     socket.emit('player-join-game', params);
-    
-    document.getElementById('answer1').style.visibility = "visible";
-    document.getElementById('answer2').style.visibility = "visible";
-    document.getElementById('answer3').style.visibility = "visible";
-    document.getElementById('answer4').style.visibility = "visible";
+    document.getElementsByClassName("buttons")[0].style.display="block"
 });
 
 socket.on('noGameFound', function(){
@@ -27,10 +23,7 @@ function answerSubmitted(num){
         socket.emit('playerAnswer', num);//Sends player answer to server
         
         //Hiding buttons from user
-        document.getElementById('answer1').style.visibility = "hidden";
-        document.getElementById('answer2').style.visibility = "hidden";
-        document.getElementById('answer3').style.visibility = "hidden";
-        document.getElementById('answer4').style.visibility = "hidden";
+        document.getElementsByClassName("buttons")[0].style.display="none"
         document.getElementById('message').style.display = "block";
         document.getElementById('message').innerHTML = "Answer Submitted! Waiting on other players...";
         
@@ -54,10 +47,7 @@ socket.on('questionOver', function(data){
         document.getElementById('message').style.display = "block";
         document.getElementById('message').innerHTML = "Incorrect!";
     }
-    document.getElementById('answer1').style.visibility = "hidden";
-    document.getElementById('answer2').style.visibility = "hidden";
-    document.getElementById('answer3').style.visibility = "hidden";
-    document.getElementById('answer4').style.visibility = "hidden";
+    document.getElementsByClassName("buttons")[0].style.display="none"
     socket.emit('getScore');
 });
 
@@ -65,17 +55,14 @@ socket.on('newScore', function(data){
     document.getElementById('scoreText').innerHTML = "Score: " + data;
 });
 
-socket.on('nextQuestionPlayer', function(){
+socket.on('nextQuestionPlayer', function(data){
     correct = false;
     playerAnswered = false;
-    
-    document.getElementById('answer1').style.visibility = "visible";
-    document.getElementById('answer2').style.visibility = "visible";
-    document.getElementById('answer3').style.visibility = "visible";
-    document.getElementById('answer4').style.visibility = "visible";
+    document.getElementsByClassName("buttons")[0].style.display="none"
     document.getElementById('message').style.display = "none";
     document.body.style.backgroundColor = "white";
-    
+    for(var i = 1; i <= 4; i++)
+        document.getElementById('answer' + i).innerHTML = data.answers[i - 1];
 });
 
 socket.on('hostDisconnect', function(){
@@ -91,12 +78,9 @@ socket.on('playerGameData', function(data){
    }
 });
 
-socket.on('GameOver', function(){
+socket.on('GameOver', function(_){
     document.body.style.backgroundColor = "#FFFFFF";
-    document.getElementById('answer1').style.visibility = "hidden";
-    document.getElementById('answer2').style.visibility = "hidden";
-    document.getElementById('answer3').style.visibility = "hidden";
-    document.getElementById('answer4').style.visibility = "hidden";
+    document.getElementsByClassName("buttons")[0].style.display="none"
     document.getElementById('message').style.display = "block";
     document.getElementById('message').innerHTML = "GAME OVER";
 });

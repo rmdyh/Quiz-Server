@@ -1,1 +1,3 @@
 frontend/node_modules/
+font_compress/*.otf
+font_compress/*.woff2

@@ -30,13 +30,13 @@ body {
     color: white;
     text-align: center;
     font-size: 50px;
-    font-family: 'Raleway', sans-serif;
+    font-family: 'NotoSansCJK-Regular-1.subset', 'Gothic', sans-serif;
 }
 #subtitle{
     color: white;
     text-align: center;
     font-size: 20px;
-    font-family: 'Raleway', sans-serif;
+    font-family: 'NotoSansCJK-Regular-1.subset', 'Gothic', sans-serif;
 }
 #link{
     color: white;
