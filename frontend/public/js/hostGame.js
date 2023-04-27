@@ -22,6 +22,7 @@ socket.on('gameQuestions', function(data){
     document.getElementById('question').innerHTML = data.question;
     for(var i = 1; i <= 4; i++)
         document.getElementById('answer' + i).innerHTML = data.answers[i - 1];
+    document.getElementById('questionNum').innerHTML = "Question " + data.qcount;
     document.getElementById('playersAnswered').innerHTML = "Players Answered 0 / " + data.playersInGame;
     updateTimer();
 });

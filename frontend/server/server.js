@@ -97,28 +97,22 @@ io.on('connection', (socket) => {
                     players.players[i].hostId = socket.id;
                 }
             }
-            var gameid = game.gameData['gameid'];
-            MongoClient.connect(url, function(err, db){
-                if (err) throw err;
-    
-                var dbo = db.db('kahootDB');
-                var query = { id:  parseInt(gameid)};
-                dbo.collection("kahootGames").find(query).toArray(function(err, res) {
-                    if (err) throw err;
-                    
-                    var question = res[0].questions[0];
-                    
-                    socket.emit('gameQuestions', {
-                        question: question.question,
-                        answers: question.answers,
-                        playersInGame: playerData.length
-                    });
-                    db.close();
+            var gameid = game.gameData.gameid;
+            getGameById(gameid).then((res) => {
+                var question = res.questions[0];
+                // send the question to host
+                socket.emit('gameQuestions', {
+                    question: question.question,
+                    answers: question.answers,
+                    qcount: game.gameData.question + " / " + res.questions.length,
+                    playersInGame: playerData.length
                 });
-            });
-            
-            
-            io.to(game.pin).emit('gameStartedPlayer');
+                // send the question to players
+                io.to(game.pin).emit('gameStartedPlayer');
+            }).catch((err) => {
+                throw err;
+            })
+            // Set the game state to alive
             game.gameData.questionLive = true;
         }else{
             socket.emit('noGameFound');//No game was found, redirect user
@@ -331,6 +325,7 @@ io.on('connection', (socket) => {
                 socket.emit('gameQuestions', {
                     question: question.question,
                     answers: question.answers,
+                    qcount: game.gameData.question + " / " + res.questions.length,
                     playersInGame: playerData.length
                 });
     
