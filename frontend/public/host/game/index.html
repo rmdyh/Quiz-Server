@@ -7,32 +7,44 @@
     </head>
     <body>
         <div class="stats">
-            <h4 id = "questionNum">Question 1 / x</h4>
-            <h4 id = "playersAnswered">Players Answered: 0 / x</h4>
-            <h4 id = "timerText">Time Left:<span id = "num"> 20</span></h4>
+            <div id = "questionNum">Question 1 / x</div>
+            <div id = "playersAnswered">Players Answered: 0 / x</div>
+            <div id = "timerText">Time Left:<span id = "num"> 20</span></div>
         </div>
         <div class="question-results">
-            <div class = "square" id = "square1"></div>
-            <div class = "square" id = "square2"></div>
-            <div class = "square" id = "square3"></div>
-            <div class = "square" id = "square4"></div>
+            <div class = "square-wrapper">
+                <div class="square" id = "square1"></div>
+                <div> 0% </div>
+            </div>
+            <div class = "square-wrapper">
+                <div class="square" id = "square2"></div>
+                <div> 0% </div>
+            </div>
+            <div class = "square-wrapper">
+                <div class="square" id = "square3"></div>
+                <div> 0% </div>
+            </div>
+            <div class = "square-wrapper">
+                <div class="square" id = "square4"></div>
+                <div> 0% </div>
+            </div>
         </div>
         <div class="question">
-            <h2 id = "question">Question</h2>
-            <h3 id = "answer1" class="answer">Answer</h3>
-            <h3 id = "answer2" class="answer">Answer</h3>
-            <h3 id = "answer3" class="answer">Answer</h3>
-            <h3 id = "answer4" class="answer">Answer</h3>
-            <button onclick = "nextQuestion()" id = "nextQButton">Next Question</button>
+            <div id = "question">Question</div>
+            <div id = "answer1" class="answer">Answer</div>
+            <div id = "answer2" class="answer">Answer</div>
+            <div id = "answer3" class="answer">Answer</div>
+            <div id = "answer4" class="answer">Answer</div>
+            <a onclick = "nextQuestion()" id = "nextQButton">Next Question</a>
         </div>
         <div class="game-results">
             <h2>GAME OVER</h2>
-            <h2 id = "winnerTitle">Top 5 Players</h2>
-            <h3 id = "winner1">1.</h3>
-            <h3 id = "winner2">2.</h3>
-            <h3 id = "winner3">3.</h3>
-            <h3 id = "winner4">4.</h3>
-            <h3 id = "winner5">5.</h3>
+            <div id = "winnerTitle">Top 5 Players</div>
+            <div id = "winner1">1.</div>
+            <div id = "winner2">2.</div>
+            <div id = "winner3">3.</div>
+            <div id = "winner4">4.</div>
+            <div id = "winner5">5.</div>
         </div>
         
         <script src = "../../socket.io/socket.io.js"></script>

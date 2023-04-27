@@ -342,15 +342,19 @@ io.on('connection', (socket) => {
                     return b.gameData.score - a.gameData.score;
                 })
                 var ret = [];
-                for(var i = 0; i < 5 && i < playersInGame.length; i++)
-                    ret.push({
-                        name: playersInGame[i].name,
-                        score: playersInGame[i].gameData.score
-                    })
+                for(var i = 0; i < 5; i++)
+                    if(i < playersInGame.length)
+                        ret.push({
+                            name: playersInGame[i].name,
+                            score: playersInGame[i].gameData.score
+                        });
+                    else
+                        ret.push({
+                            name: 'Nobody',
+                            score: 0
+                        });
                 
-                io.to(game.pin).emit('GameOver', {
-                    ret: ret
-                });
+                io.to(game.pin).emit('GameOver', {ret: ret});
             }
         }).catch((err)=>{
             throw err;

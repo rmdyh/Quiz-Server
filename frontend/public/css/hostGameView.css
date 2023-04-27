@@ -1,94 +1,82 @@
-#answer1{
+body {
+    padding: 0 20px;
+}
+
+#answer1, #square1{
     background-color: #4CAF50;
 }
-#answer2{
+#answer2, #square2{
     background-color: #f94a1e;
 }
-#answer3{
+#answer3, #square3{
     background-color: #3399ff;
 }
-#answer4{
+#answer4, #square4{
     background-color: #ff9933;
 }
 
-.stats{
-    padding: 0px 10px;
-    flex-grow: 0;
+.stats div {
+    margin: 10px 0;
+    font-weight: bold;
 }
 
-.answer{
-    margin: auto;
+.stats #num {
+    font-size: 35px;
+}
+
+.question #question{
+    text-align: left;
+    font-size: 25px;
+    font-weight: bold;
+    margin: 15px 0;
+}
+
+.question .answer{
+    margin: 10px auto;
     padding: 20px 20px;
     height: 50%;
     font-size: 20px;
     color: #000;
+    text-align: left;
+    font-weight: bold;
 }
 
-.square{
-    border: none;
-    padding: 15px 32px;
+.square-wrapper{
     text-align: center;
-    text-decoration: none;
-    display: none;
     font-size: 16px;
-    margin: 4px 2px;
-    width: 70px;
+    width: 120px;
+    font-size: 20px;
+    display: inline-block;
+}
+
+.square {
+    padding: 5px 0;
     height: 0px;
-    font-size: 20px;
 }
 
-#square1{
-    background-color: #4CAF50;
-}
-#square2{
-    background-color: #f94a1e;
-}
-#square3{
-    background-color: #3399ff;
-}
-#square4{
-    background-color: #ff9933;
-}
-
-#nextQButton{
+.question-results, .game-results {
     display: none;
 }
 
-#num{
-    font-size: 35px;
+#nextQButton {
+    display: none;
+    border-radius: 4px;
+    background-color: #333;
+    color: white;
+    padding: 10px 20px;
+    margin: 20px 0;
 }
 
-#winner1{
-    text-align: center;
+.game-results div {
     font-size: 30px;
-    display: none;
+    text-align: center;
 }
 
-#winner2{
-    text-align: center;
-    font-size: 22px;
-    display: none;
+.game-results h2{
+    font-size: 40px;
 }
 
-#winner3{
-    text-align: center;
-    font-size: 20px;
-    display: none;
-}
-
-#winner4{
-    text-align: center;
-    display: none;
-}
-
-#winner5{
-    text-align: center;
-    display: none;
-}
-
-#winnerTitle{
-    text-align: center;
+.game-results #winnerTitle{
     font-size: 35px;
     color: #3399ff;
-    display: none;
 }
