@@ -20,7 +20,21 @@ var MongoClient = require('mongodb').MongoClient;
 var mongoose = require('mongoose');
 var url = "mongodb://localhost:27017/";
 
-
+// getGameByid returns a promise with a raw result of query gameid.
+async function getGameById (gameid) {
+    return new Promise((resolve, reject) => {
+        MongoClient.connect(url, (err, db) => {
+            if (err) throw err;
+            var dbo = db.db('kahootDB');
+            var query = { id:  parseInt(gameid)};
+    
+            dbo.collection("kahootGames").find(query).toArray((err, res) => {
+                if (err) throw err;
+                resolve(res);
+            });
+        });
+    })
+}
 
 app.use(express.static(publicPath));
 
@@ -401,3 +415,4 @@ io.on('connection', (socket) => {
     });
     
 });
+
