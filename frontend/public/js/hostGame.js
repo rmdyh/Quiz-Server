@@ -140,9 +140,8 @@ socket.on('GameOver', function(data){
     document.getElementById('answer2').style.display = "none";
     document.getElementById('answer3').style.display = "none";
     document.getElementById('answer4').style.display = "none";
-    document.getElementById('timerText').innerHTML = "";
+    document.getElementsByClassName('stats')[0].style.display = "none";
     document.getElementById('question').innerHTML = "GAME OVER";
-    document.getElementById('playersAnswered').innerHTML = "";
     
     
     document.getElementById('winner1').style.display = "block";
@@ -152,8 +151,9 @@ socket.on('GameOver', function(data){
     document.getElementById('winner5').style.display = "block";
     document.getElementById('winnerTitle').style.display = "block";
     
+    data = data.ret;
     for(var i = 1; i <= 5; i++){
-        var text = data[i-1].name + '(' + data[i-1].score + ')';
+        var text = i + '. ' + data[i-1].name + '(' + data[i-1].score + ')';
         document.getElementById('winner' + i).innerHTML = text;
     }
 });
