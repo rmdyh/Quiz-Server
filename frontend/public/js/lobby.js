@@ -13,6 +13,10 @@ socket.on('connect', function() {
 socket.on('noGameFound', function(){
     window.location.href = '../';
 });
+//Boot player back to join screen if the player name exists
+socket.on('playerExist', function(){
+    window.location.href = '../';
+});
 //If the host disconnects, then the player is booted to main screen
 socket.on('hostDisconnect', function(){
     window.location.href = '../';
