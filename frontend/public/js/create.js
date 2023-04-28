@@ -11,11 +11,7 @@ socket.on('gameNamesData', function(data){
         
         button.innerHTML = data[i].name;
         button.setAttribute('onClick', "startGame('" + data[i].id + "')");
-        button.setAttribute('id', 'gameButton');
-        
         div.appendChild(button);
-        div.appendChild(document.createElement('br'));
-        div.appendChild(document.createElement('br'));
     }
 });
 
