@@ -404,7 +404,11 @@ io.on('connection', (socket) => {
             var dbo = db.db('kahootDB');
             dbo.collection('kahootGames').find({}).toArray(function (err, result) {
                 if (err) throw err;
-                data.id = Object.keys(result).length;
+                var num = Object.keys(result).length;
+                data.id = 0;
+                if (num > 0) {
+                    data.id = result[num - 1].id + 1;
+                }
                 dbo.collection("kahootGames").insertOne(data, function (err, res) {
                     if (err) throw err;
                     db.close();
