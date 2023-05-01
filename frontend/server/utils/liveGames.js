@@ -5,6 +5,7 @@ class LiveGames {
     addGame(pin, hostId, gameLive, gameData){
         var game = {pin, hostId, gameLive, gameData};
         this.games.push(game);
+        game.gameData.playerNum = 0;
         return game;
     }
     removeGame(hostId){

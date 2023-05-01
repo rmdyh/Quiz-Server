@@ -2,8 +2,8 @@ class Players {
     constructor () {
         this.players = [];
     }
-    addPlayer(hostId, playerLobbyId, name, gameData){
-        var player = {hostId, playerLobbyId, name, gameData};
+    addPlayer(hostId, lobbyId, name, gameData){
+        var player = {hostId, lobbyId, name, gameData};
         this.players.push(player);
         return player;
     }
@@ -18,16 +18,16 @@ class Players {
     getPlayer(playerId){
         return this.players.filter((player) => player.playerId === playerId)[0]
     }
-    removePlayerByLobbyId(playerLobbyId){
-        var player = this.getPlayerByLobbyId(playerLobbyId);
+    removePlayerByLobbyId(lobbyId){
+        var player = this.getPlayerByLobbyId(lobbyId);
         
         if(player){
-            this.players = this.players.filter((player) => player.playerLobbyId !== playerLobbyId);
+            this.players = this.players.filter((player) => player.lobbyId !== lobbyId);
         }
         return player;
     }
-    getPlayerByLobbyId(playerLobbyId){
-        return this.players.filter((player) => player.playerLobbyId === playerLobbyId)[0]
+    getPlayerByLobbyId(lobbyId){
+        return this.players.filter((player) => player.lobbyId === lobbyId)[0]
     }
     getPlayers(hostId){
         return this.players.filter((player) => player.hostId === hostId);

@@ -59,9 +59,12 @@ socket.on('questionOver', function(playerData, correct){
     
     // Calc the total and the number of ans for each choice
     for(var i = 0; i < playerData.length; i++){
-        ans = playerData[i].gameData.answer
-        player_answers[ans - 1] += 1;
-        total += 1;
+        playerId = playerData[i].playerId
+        if (playerId) {
+            ans = playerData[i].gameData.answer
+            player_answers[ans - 1] += 1;
+            total += 1;
+        }
     }
     
     // For each answer
