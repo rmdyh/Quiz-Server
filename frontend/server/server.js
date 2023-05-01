@@ -145,8 +145,15 @@ io.on('connection', (socket) => {
                 socket.join(game.pin);
                 player.playerId = socket.id; // Update player id with socket id
                 socket.emit('playerGameData', {name: player.name, score: player.gameData.score});
-                // tell the player the going on question
-                socket.emit('nextQuestionPlayer', {answers: game.gameData.questionNow});
+                if (player.gameData.answer == 0) {
+                    // tell the player the going on question
+                    // bc the player haven't submitted its answer
+                    socket.emit('nextQuestionPlayer', { answers: game.gameData.questionNow });
+                }
+                else {
+                    // tell the player its submitted answer
+                    socket.emit('haveSubmitted', player.gameData.answer)
+                }
                 return;
             }
         }

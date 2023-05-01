@@ -37,6 +37,7 @@ button{
 
 .buttons{
     flex-grow: 1;
+    display: none;
 }
 
 #message{
