@@ -5,6 +5,7 @@ var params = jQuery.deparam(window.location.search); //Gets the id from url
 var timer;
 
 var time = 20;
+var qtime = 0;
 
 //When host connects to server
 socket.on('connect', function() {
@@ -24,11 +25,13 @@ socket.on('gameQuestions', function(data){
         document.getElementById('answer' + i).innerHTML = data.answers[i - 1];
     document.getElementById('questionNum').innerHTML = "Question " + data.qcount;
     document.getElementById('playersAnswered').innerHTML = "Players Answered 0 / " + data.playersInGame;
+    qtime = data.qtime;
     updateTimer();
 });
 
 function updateTimer(){
-    time = 20;
+    time = qtime;
+    document.getElementById('num').textContent = " " + time;
     timer = setInterval(function(){
         time -= 1;
         document.getElementById('num').textContent = " " + time;
@@ -43,9 +46,10 @@ socket.on('updatePlayersAnswered', function(data){
     var text = "Players Answered " + data.playersAnswered + " / " + data.playersInGame;
     document.getElementById('playersAnswered').innerHTML = text; 
     // Return the time
+    var timeScore = time / qtime * 100;
     socket.emit('questionTime', {
         player: data.playerId,
-        time: data.correct ? time : 0
+        timeScore: data.correct ? timeScore : 0
     });
 });
 

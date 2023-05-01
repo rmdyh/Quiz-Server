@@ -83,10 +83,12 @@ io.on('connection', (socket) => {
             var gameid = game.gameData.gameid;
             getGameById(gameid).then((res) => {
                 var question = res.questions[0];
+                console.log(question);
                 // send the question to host
                 socket.emit('gameQuestions', {
                     question: question.question,
                     answers: question.answers,
+                    qtime: question.time,
                     qcount: game.gameData.question + " / " + res.questions.length,
                     playersInGame: playerData.length
                 });
@@ -275,9 +277,7 @@ io.on('connection', (socket) => {
         // check whether the player exists
         // the other case is the player has disconnected
         if (player) {
-            var time = data.time / 20;
-            time = time * 100;
-            player.gameData.appendScore += time;
+            player.gameData.appendScore += data.timeScore;
         }
         else {
             player = players.getPlayerByLobbyId(data.player);
@@ -337,6 +337,7 @@ io.on('connection', (socket) => {
                 socket.emit('gameQuestions', {
                     question: question.question,
                     answers: question.answers,
+                    qtime: question.time,
                     qcount: game.gameData.question + " / " + res.questions.length,
                     playersInGame: game.gameData.playerNum
                 });
@@ -395,10 +396,7 @@ io.on('connection', (socket) => {
                 db.close();
             });
         });
-
-
     });
-
 
     socket.on('newQuiz', function (data) {
         MongoClient.connect(url, function (err, db) {
@@ -406,25 +404,14 @@ io.on('connection', (socket) => {
             var dbo = db.db('kahootDB');
             dbo.collection('kahootGames').find({}).toArray(function (err, result) {
                 if (err) throw err;
-                var num = Object.keys(result).length;
-                if (num == 0) {
-                    data.id = 1
-                    num = 1
-                } else {
-                    data.id = result[num - 1].id + 1;
-                }
-                var game = data;
-                dbo.collection("kahootGames").insertOne(game, function (err, res) {
+                data.id = Object.keys(result).length;
+                dbo.collection("kahootGames").insertOne(data, function (err, res) {
                     if (err) throw err;
                     db.close();
                 });
-                db.close();
-                socket.emit('startGameFromCreator', num);
+                socket.emit('startGameFromCreator', data.id);
             });
-
         });
-
-
     });
 
 });
