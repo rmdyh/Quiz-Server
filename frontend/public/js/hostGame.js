@@ -68,7 +68,7 @@ socket.on('questionOver', function(playerData, correct){
     }
     
     // For each answer
-    for(var i = 1; i < 4; i++){
+    for(var i = 1; i <= 4; i++){
         // Shows user correct answer with effects on elements
         var elem = document.getElementById('answer' + i);
         if(i == correct)
@@ -81,7 +81,7 @@ socket.on('questionOver', function(playerData, correct){
         // Draw the graph
         var square = document.getElementById('square' + i)
         square.style.height = ans_percent + "px";
-        square.nextElementSibling.innerHTML = ans_percent + "%";
+        square.nextElementSibling.innerHTML = `${ans_percent.toFixed(2)}%`;
     }
     // Show the graph and button
     document.getElementsByClassName('question-results')[0].style.display = "block";
