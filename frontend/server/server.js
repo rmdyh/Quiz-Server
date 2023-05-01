@@ -112,12 +112,21 @@ io.on('connection', (socket) => {
             var hostId = game.hostId; //Get the id of host of game
             var player = players.getPlayers(hostId).filter((player) => player.name === params.name)[0];
             if (player) {
-                // Tell the player that player exist
-                // Player is sent back to 'join' page
-                socket.emit('playerExist');
-                console.log('Player ' + params.name + ' is rejected because the player exists.');
+                if (game.gameLive && player.playerId == undefined) {
+                    // The game has started, and the player dont in the game
+                    // Let the player join the game
+                    player.lobbyId = socket.id;
+                    socket.emit('gameStartedPlayer');
+                }
+                else {
+                    // Tell the player that player exist
+                    // Player is sent back to 'join' page
+                    socket.emit('playerExist');
+                    console.log('Player ' + params.name + ' is rejected because the player exists.');
+                }
             }
             else {
+                // If the game has started, the player will stuck in the lobby and wait
                 players.addPlayer(hostId, socket.id, params.name, { score: 0, answer: 0, appendScore: 0 }); //add player to game
                 socket.join(params.pin); //Player is joining room based on pin
                 var playersInGame = players.getPlayers(hostId); //Getting all players in game
@@ -146,21 +155,32 @@ io.on('connection', (socket) => {
                 player.playerId = socket.id; // Update player id with socket id
                 socket.emit('playerGameData', { name: player.name, score: player.gameData.score });
                 game.gameData.playerNum += 1;
+
+                // tell the player its submitted answer
+                if (player.gameData.answer > 0) {
+                    socket.emit('haveSubmitted', player.gameData.answer);
+                    game.gameData.playersAnswered += 1;
+                }
+
+                // The question is alive
                 if (game.gameData.questionLive) {
+                    // tell the player the going on question
+                    // bc the player haven't submitted its answer
                     if (player.gameData.answer == 0) {
-                        // tell the player the going on question
-                        // bc the player haven't submitted its answer
                         socket.emit('nextQuestionPlayer', { answers: game.gameData.questionNow });
-                    }
-                    else {
-                        // tell the player its submitted answer
-                        socket.emit('haveSubmitted', player.gameData.answer);
-                        game.gameData.playersAnswered += 1;
                     }
                 }
                 else {
                     socket.emit('questionOver', [player], game.gameData.correct);
                 }
+
+                // Tell the host that the player has joined
+                io.to(game.pin).emit('updatePlayersAnswered', {
+                    playersInGame: game.gameData.playerNum,
+                    playersAnswered: game.gameData.playersAnswered,
+                    playerId: player.lobbyId,
+                });
+
                 return;
             }
         }
@@ -199,13 +219,11 @@ io.on('connection', (socket) => {
                         if (player.gameData.answer > 0){
                             game.gameData.playersAnswered -= 1;
                         }
-                        else {
-                            io.to(game.pin).emit('updatePlayersAnswered', {
-                                playersInGame: game.gameData.playerNum,
-                                playersAnswered: game.gameData.playersAnswered,
-                                playerId: player.lobbyId,
-                            });
-                        }
+                        io.to(game.pin).emit('updatePlayersAnswered', {
+                            playersInGame: game.gameData.playerNum,
+                            playersAnswered: game.gameData.playersAnswered,
+                            playerId: player.lobbyId,
+                        });
                     } else {
                         players.removePlayer(socket.id);//Removes player from players class
                         socket.leave(game.pin); //Player is leaving the room
@@ -295,7 +313,6 @@ io.on('connection', (socket) => {
     });
 
     socket.on('nextQuestion', function () {
-        var playerData = players.getPlayers(socket.id);
         //Reset players current answer to 0
         for (var i = 0; i < Object.keys(players.players).length; i++) {
             if (players.players[i].hostId == socket.id) {
@@ -321,7 +338,7 @@ io.on('connection', (socket) => {
                     question: question.question,
                     answers: question.answers,
                     qcount: game.gameData.question + " / " + res.questions.length,
-                    playersInGame: playerData.length
+                    playersInGame: game.gameData.playerNum
                 });
                 game.gameData.questionNow = question.answers;
                 game.gameData.correct = question.correct;
