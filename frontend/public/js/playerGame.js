@@ -42,7 +42,7 @@ socket.on('questionOver', function (playerData, correct) {
     }
     playerData.forEach(elem => {
         if(elem.name == playerName)
-            document.getElementById('scoreText').innerHTML = "Score: " + elem.gameData.score;
+            document.getElementById('scoreText').innerHTML = "Score: " + elem.gameData.score.toFixed(2);
     });
 });
 
@@ -73,7 +73,7 @@ socket.on('hostDisconnect', function(){
 socket.on('playerGameData', function(data){
     playerName = data.name;
     document.getElementById('nameText').innerHTML = "Name: " + data.name;
-    document.getElementById('scoreText').innerHTML = "Score: " + data.score;
+    document.getElementById('scoreText').innerHTML = "Score: " + data.score.toFixed(2);
 });
 
 socket.on('GameOver', function(_){

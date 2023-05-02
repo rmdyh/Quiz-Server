@@ -114,7 +114,7 @@ socket.on('GameOver', function(data){
     // Display the winner
     data = data.ret;
     for(var i = 1; i <= 5; i++){
-        var text = i + '. ' + data[i-1].name + ' (' + data[i-1].score + ')';
+        var text = i + '. ' + data[i-1].name + ' (' + data[i-1].score.toFixed(2) + ')';
         document.getElementById('winner' + i).innerHTML = text;
     }
     // Hide everything and show the results

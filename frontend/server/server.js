@@ -83,7 +83,6 @@ io.on('connection', (socket) => {
             var gameid = game.gameData.gameid;
             getGameById(gameid).then((res) => {
                 var question = res.questions[0];
-                console.log(question);
                 // send the question to host
                 socket.emit('gameQuestions', {
                     question: question.question,
