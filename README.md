@@ -6,7 +6,7 @@ This project is forked from [kahoot-clone-nodejs](https://github.com/ethanbrimha
 
 1. A Chinese font named "NotoSansCJK"(思源黑体). It is compressed from the original version from google fonts. [Here](https://github.com/notofonts/noto-cjk) is a link to its Github page. We compressed it using a script shell `./font_compress/compress.sh` inspired by [MoyuScript](https://gist.github.com/MoyuScript/f94d0c594e47113b209156a653aaba93). 
 2. Rewrite the `.css` files in the `frontend/public/css/` folder. We delete some redundant codes.
-3. Add more features as introduced in [here](#Feature).
+3. Add more features as introduced in [here](#features).
 
 ## [Description](https://github.com/ethanbrimhall/kahoot-clone-nodejs#description)
 
