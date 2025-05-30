@@ -16,8 +16,14 @@ class LiveGames {
         }
         return game;
     }
+    isGameExist(hostId){
+        return this.getGame(hostId) != undefined;
+    }
     getGame(hostId){
         return this.games.filter((game) => game.hostId === hostId)[0];
+    }
+    isGameExistbyPin(pin){
+        return this.getGamebyPin(pin) != undefined;
     }
     getGamebyPin(pin){
         return this.games.filter((game) => game.pin == pin)[0];
